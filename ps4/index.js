@@ -3,8 +3,8 @@ const { Device } = require('ps4-waker');
 
 // 実行時引数で指定する
 let port     = process.argv[2];
-let userName = process.argv[3];
-let passWord = process.argv[4];
+let userName = process.argv[3] || '';
+let passWord = process.argv[4] || '';
 
 // PS4でトルネの起動
 function TurnOnPS4Torune() {
