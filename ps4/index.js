@@ -4,8 +4,11 @@ const Mqtt       = require('./mqtt.js');
 const { Device } = require('ps4-waker');
 
 // ソフトに対応するID
-const TORNE = "CUSA00442";
-const KH3   = "CUSA11060";
+// https://store.playstation.com/ja-jp/home/games
+// ↑でアプリを検索し、URLに含まれるIDを調べる
+const TORNE      = "CUSA00442";
+const KH3        = "CUSA11060";
+const RAKUTEN_TV = "CUSA11244";
 
 // 実行時引数で指定する
 let port     = process.argv[2];
@@ -54,6 +57,10 @@ function ExecPS4(topic, message) {
 					TurnOnTitle(KH3);
 					break;
 
+				case '楽天TV':
+					TurnOnTitle(RAKUTEN_TV);
+					break;
+
 				default:
 					break;
 			}
@@ -62,7 +69,7 @@ function ExecPS4(topic, message) {
 				case 'off':
 					TurnOffPS4();
 					break;
-					
+
 				default:
 					break;
 			}
