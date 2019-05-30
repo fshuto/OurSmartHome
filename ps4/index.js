@@ -1,9 +1,11 @@
+'use strict'
+
 const Mqtt       = require('./mqtt.js');
 const { Device } = require('ps4-waker');
 
 // ソフトに対応するID
-const TORUNE = "CUSA00442";
-const KH3    = "CUSA11060";
+const TORNE = "CUSA00442";
+const KH3   = "CUSA11060";
 
 // 実行時引数で指定する
 let port     = process.argv[2];
@@ -11,21 +13,26 @@ let userName = process.argv[3] || '';
 let passWord = process.argv[4] || '';
 
 // PS4で指定タイトルの起動
-function TurnOnTitle(titleCode) {
-	let ps4 = new Device();
-	return ps4.turnOn().then(() => {
-		return ps4.startTitle(titleCode);
-	}).then(() => {
-		return ps4.close();
-	});
+async function TurnOnTitle(titleCode) {
+	try {
+		let ps4 = new Device();
+		await ps4.turnOn();
+		await ps4.startTitle(titleCode);
+		await ps4.close();
+	} catch(err) {
+		console.error(err);
+	}
 }
 
 // PS4の電源を消す
-function TurnOffPS4() {
-	let ps4 = new Device();
-	return ps4.turnOff().then(() => {
-		return ps4.close();
-	});
+async function TurnOffPS4() {
+	try {
+		let ps4 = new Device();
+		await ps4.turnOff();
+		await ps4.close();
+	} catch(err) {
+		console.error(err);
+	}
 }
 
 // PS4で処理を実行する
@@ -40,11 +47,13 @@ function ExecPS4(topic, message) {
 			if (data === undefined) return;
 			switch (data.app) {
 				case 'トルネ':
-					TurnOnTitle(TORUNE);
+					TurnOnTitle(TORNE);
 					break;
+
 				case 'キングダムハーツ':
 					TurnOnTitle(KH3);
 					break;
+
 				default:
 					break;
 			}
@@ -53,6 +62,7 @@ function ExecPS4(topic, message) {
 				case 'off':
 					TurnOffPS4();
 					break;
+					
 				default:
 					break;
 			}
