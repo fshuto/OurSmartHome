@@ -8,12 +8,7 @@ let passWord = process.argv[4] || '';
 
 // PS4でトルネの起動
 function TurnOnPS4Torune() {
-	let ps4 = new Device();
-	ps4.turnOn().then(() => {
-		ps4.startTitle("CUSA00442").then(() => {
-			ps4.close();
-		});
-	});
+	TurnOnTitle("CUSA00442");
 }
 
 // PS4でキングダムハーツ3の起動
