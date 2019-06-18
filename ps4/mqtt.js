@@ -5,6 +5,7 @@
 // This code uses the Beebotte API, you must have an account.
 // You can register here: http://beebotte.com/register
 /////////////////////////////////////////////////////////////
+'use strict'
 
 let mqtt = require('mqtt')
 

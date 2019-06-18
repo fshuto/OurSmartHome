@@ -1,6 +1,7 @@
 'use strict'
 
 const Mqtt       = require('./mqtt.js');
+const config     = require('./config.js');
 const { Device } = require('ps4-waker');
 
 // ソフトに対応するID
@@ -11,10 +12,10 @@ const KH3        = "CUSA11060";
 const RAKUTEN_TV = "CUSA11244";
 const YOUTUBE    = "CUSA01065";
 
-// 実行時引数で指定する
-let port     = process.argv[2];
-let userName = process.argv[3] || '';
-let passWord = process.argv[4] || '';
+// 実行時引数で指定、もしくはconfigファイルから設定を読み込む
+let port     = process.argv[2] || config.port;
+let userName = process.argv[3] || config.beebotte.userName || '';
+let passWord = process.argv[4] || config.beebotte.passWord || '';
 
 // PS4で指定タイトルの起動
 async function TurnOnTitle(titleCode) {
