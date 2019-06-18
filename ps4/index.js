@@ -3,14 +3,18 @@
 const Mqtt       = require('./mqtt.js');
 const config     = require('./config.js');
 const { Device } = require('ps4-waker');
+const request    = require('request-promise');
 
 // ソフトに対応するID
 // https://store.playstation.com/ja-jp/home/games
 // ↑でアプリを検索し、URLに含まれるIDを調べる
-const TORNE      = "CUSA00442";
-const KH3        = "CUSA11060";
-const RAKUTEN_TV = "CUSA11244";
-const YOUTUBE    = "CUSA01065";
+const TORNE      = 'CUSA00442';
+const KH3        = 'CUSA11060';
+const RAKUTEN_TV = 'CUSA11244';
+const YOUTUBE    = 'CUSA01065';
+
+// iftttのイベント名
+const POWER_TV   = 'power_tv';
 
 // 実行時引数で指定、もしくはconfigファイルから設定を読み込む
 let port     = process.argv[2] || config.port;
@@ -41,7 +45,7 @@ async function TurnOffPS4() {
 }
 
 // PS4で処理を実行する
-function ExecPS4(topic, message) {
+async function ExecPS4(topic, message) {
 	let msgObj = JSON.parse(message);
 
 	switch (topic) {
@@ -53,24 +57,24 @@ function ExecPS4(topic, message) {
 			switch (data.app) {
 				case 'トルネ':
 				case 'torne':
-					TurnOnTitle(TORNE);
+					await TurnOnTitle(TORNE);
 					break;
 
 				case 'キングダムハーツ':
 				case 'キングダム ハーツ':
-					TurnOnTitle(KH3);
+					await TurnOnTitle(KH3);
 					break;
 
 				case '楽天TV':
 				case '楽天 TV':
 				case '楽天':
 				case 'らくてん':
-					TurnOnTitle(RAKUTEN_TV);
+					await TurnOnTitle(RAKUTEN_TV);
 					break;
 	
 				case 'youtube':
 				case 'YouTube':
-					TurnOnTitle(YOUTUBE);
+					await TurnOnTitle(YOUTUBE);
 					break;
 
 				default:
@@ -79,7 +83,9 @@ function ExecPS4(topic, message) {
 
 			switch (data.action) {
 				case 'off':
-					TurnOffPS4();
+					// PS4の電源を落とした後にTVの電源も落とす
+					await TurnOffPS4();
+					await sendEventIfttt(POWER_TV);
 					break;
 
 				default:
@@ -90,6 +96,15 @@ function ExecPS4(topic, message) {
 		default:
 			break;
 	}
+}
+
+// iftttにイベントを送信する
+async function sendEventIfttt(event) {
+	const options = {
+		url: `https://maker.ifttt.com/trigger/${event}/with/key/${config.ifttt.key}`,
+		method: 'GET'
+	}
+	return request(options).catch((err) => { console.error(err); });
 }
 
 let mqtt = new Mqtt('OurSmartHome/PS4', ExecPS4, port, userName, passWord);
